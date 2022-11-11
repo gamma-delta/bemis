@@ -19,7 +19,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "at.petrak.bemis.fabric.FabricBemisInit"
+            "at.petrak.bemis.fabric.FabricBemisEntrypoint"
         ]
     },
     "mixins": [
