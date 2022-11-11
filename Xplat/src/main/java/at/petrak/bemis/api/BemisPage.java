@@ -1,7 +1,7 @@
 package at.petrak.bemis.api;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
+import java.util.List;
 
 public final class BemisPage {
-    Int2ObjectRBTreeMap<>
+    List<BemisVerse> verses;
 }

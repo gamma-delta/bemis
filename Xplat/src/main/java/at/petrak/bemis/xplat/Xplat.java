@@ -1,13 +1,16 @@
 package at.petrak.bemis.xplat;
 
 import at.petrak.bemis.api.BemisApi;
-import net.minecraft.Util;
+import at.petrak.bemis.api.BemisVerseType;
+import com.google.common.base.Suppliers;
+import net.minecraft.core.Registry;
 
 import java.util.ServiceLoader;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public interface Xplat {
-    Xplat IT = Util.make(() -> {
+    Supplier<Xplat> INSTANCE = Suppliers.memoize(() -> {
         var providers = ServiceLoader.load(Xplat.class).stream().toList();
         if (providers.size() != 1) {
             var names = providers.stream().map(p -> p.type().getName()).collect(Collectors.joining(",", "[", "]"));
@@ -19,4 +22,12 @@ public interface Xplat {
             return provider.get();
         }
     });
+
+    static Xplat get() {
+        return INSTANCE.get();
+    }
+
+    //
+
+    Registry<BemisVerseType<?>> getVerseTypeRegistry();
 }

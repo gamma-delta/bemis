@@ -2,7 +2,7 @@ package at.petrak.bemis.api;
 
 import net.minecraft.client.gui.Font;
 
-public interface IBemisDrawCtx {
+public interface BemisDrawCtx {
     Font font();
 
     /**

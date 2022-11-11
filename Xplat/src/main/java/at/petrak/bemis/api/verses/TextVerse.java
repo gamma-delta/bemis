@@ -1,8 +1,9 @@
 package at.petrak.bemis.api.verses;
 
 import at.petrak.bemis.api.BemisBook;
+import at.petrak.bemis.api.BemisDrawCtx;
 import at.petrak.bemis.api.BemisVerse;
-import at.petrak.bemis.api.IBemisDrawCtx;
+import at.petrak.bemis.api.BemisVerseType;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.NotImplementedException;
@@ -13,17 +14,9 @@ import java.io.Writer;
 /**
  * A Verse that simply displays text.
  */
-public class TextVerse implements BemisVerse {
-    Component text;
-
+public record TextVerse(Component text) implements BemisVerse {
     @Override
-    public void load(Node node, BemisBook book, String thisPath) throws IllegalArgumentException {
-        // TODO better error handling
-        this.text = Component.literal(node.getTextContent());
-    }
-
-    @Override
-    public int draw(PoseStack ps, IBemisDrawCtx ctx) {
+    public int draw(PoseStack ps, BemisDrawCtx ctx) {
         var seq = ctx.font().split(this.text, ctx.width());
         var vertKerning = ctx.font().lineHeight + 2;
         for (int i = 0; i < seq.size(); i++) {
@@ -35,5 +28,13 @@ public class TextVerse implements BemisVerse {
     @Override
     public void writeHTML(Writer htmlOut) {
         throw new NotImplementedException();
+    }
+
+    public static class Type extends BemisVerseType<TextVerse> {
+        @Override
+        public TextVerse load(Node node, BemisBook bookIn, String path) throws IllegalArgumentException {
+            // TODO: better loading
+            return new TextVerse(Component.literal(node.getTextContent()));
+        }
     }
 }
