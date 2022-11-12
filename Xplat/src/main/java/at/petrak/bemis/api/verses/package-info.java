@@ -1,5 +1,5 @@
 /**
- * Premade implementations of {@link at.petrak.bemis.api.BemisVerse BemisVerse}.
+ * Premade implementations of {@link at.petrak.bemis.api.book.BemisVerse BemisVerse}.
  */
 @javax.annotation.ParametersAreNonnullByDefault
 @net.minecraft.MethodsReturnNonnullByDefault

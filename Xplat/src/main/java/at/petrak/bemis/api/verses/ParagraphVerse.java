@@ -1,20 +1,17 @@
 package at.petrak.bemis.api.verses;
 
-import at.petrak.bemis.api.BemisBook;
 import at.petrak.bemis.api.BemisDrawCtx;
-import at.petrak.bemis.api.BemisVerse;
-import at.petrak.bemis.api.BemisVerseType;
+import at.petrak.bemis.api.book.BemisVerse;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.NotImplementedException;
-import org.w3c.dom.Node;
 
 import java.io.Writer;
 
 /**
- * A Verse that simply displays text.
+ * A Verse that displays a paragraph of text, stripping newlines.
  */
-public record TextVerse(Component text) implements BemisVerse {
+public record ParagraphVerse(Component text) implements BemisVerse {
     @Override
     public int draw(PoseStack ps, BemisDrawCtx ctx) {
         var seq = ctx.font().split(this.text, ctx.width());
@@ -28,13 +25,5 @@ public record TextVerse(Component text) implements BemisVerse {
     @Override
     public void writeHTML(Writer htmlOut) {
         throw new NotImplementedException();
-    }
-
-    public static class Type extends BemisVerseType<TextVerse> {
-        @Override
-        public TextVerse load(Node node, BemisBook bookIn, String path) throws IllegalArgumentException {
-            // TODO: better loading
-            return new TextVerse(Component.literal(node.getTextContent()));
-        }
     }
 }

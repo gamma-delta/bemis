@@ -1,7 +1,7 @@
 package at.petrak.bemis.impl;
 
 import at.petrak.bemis.api.BemisApi;
-import at.petrak.bemis.api.BemisVerseType;
+import at.petrak.bemis.api.book.BemisVerseType;
 import at.petrak.bemis.xplat.Xplat;
 import net.minecraft.core.Registry;
 

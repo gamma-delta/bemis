@@ -1,8 +1,10 @@
 package at.petrak.bemis.api;
 
+import at.petrak.bemis.api.book.BemisVerseType;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,18 @@ public class BemisApi {
     });
 
     /**
+     * The folder in the Minecraft resource root that Bemis books are loaded from. Each folder in <i>that</i> folder
+     * is checked to see if it makes for a valid book.
+     */
+    public static final String BOOK_FOLDER = "bemis_books";
+
+    /**
+     * The name of the file in a book folder that holds the book information. It's the only "special" file in a book
+     * folder; everything else is a page.
+     */
+    public static final String BOOK_DEFINER = "bemis.xml";
+
+    /**
      * Get an instance of the Bemis API.
      */
     public static IBemisApi get() {
@@ -45,5 +59,46 @@ public class BemisApi {
          * Get the registry for registering new verse types.
          */
         Registry<BemisVerseType<?>> getVerseTypeRegistry();
+
+        /**
+         * Returns the path to the folder defining the book with the given name. This doesn't do any validation;
+         * it's simply text transformation.
+         * <p>
+         * {@code foobar:a-book} becomes {@code foobar:bemis_books/a-book}.
+         */
+        default ResourceLocation toBookResourceFolder(ResourceLocation bookLoc) {
+            var path = String.format("%s/%s", BemisApi.BOOK_FOLDER, bookLoc.getPath());
+            return new ResourceLocation(bookLoc.getNamespace(), path);
+        }
+
+        /**
+         * Returns the path to the XML file defining the book with the given name. This doesn't do any validation;
+         * it's simply text transformation.
+         * <p>
+         * {@code foobar:a-book} becomes {@code foobar:bemis_books/a-book.xml}.
+         */
+        default ResourceLocation toBookDefiner(ResourceLocation bookLoc) {
+            var root = toBookResourceFolder(bookLoc);
+            return new ResourceLocation(root.getNamespace(), root.getPath() + "/" + BOOK_DEFINER);
+        }
+
+        /**
+         * Returns the location of the book at the given definer XML file path. This doesn't do any validation;
+         * it's simply text transformation.
+         * <p>
+         * {@code foobar:bemis_books/a-book/bemis.xml} becomes {@code foobar:bemis_books/a-book}.
+         * <p>
+         * Returns null if it's invalid.
+         */
+        @Nullable
+        default ResourceLocation toBookLoc(ResourceLocation defnFilePath) {
+            var path = defnFilePath.getPath();
+            if (!path.startsWith(BOOK_FOLDER) || !path.endsWith(BOOK_DEFINER)) {
+                return null;
+            }
+            // Strip the folder, the slash after, the definer, and the slash before
+            var slicedPath = path.substring(BOOK_FOLDER.length() + 1, path.length() - BOOK_DEFINER.length() - 1);
+            return new ResourceLocation(defnFilePath.getNamespace(), slicedPath);
+        }
     }
 }
