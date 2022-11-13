@@ -47,7 +47,7 @@ public record BemisBookConfig(
 
     public static HashMap<String, ResourceLocation> defaultVerseShortcodes() {
         HashMap<String, ResourceLocation> verseShortcodes = new HashMap<>();
-        verseShortcodes.put("text", modLoc("text"));
+        verseShortcodes.put("p", modLoc("paragraph"));
         return verseShortcodes;
     }
 }

@@ -1,8 +1,9 @@
 package at.petrak.bemis.api.book;
 
 import at.petrak.bemis.api.BemisApi;
-import at.petrak.bemis.api.IXmlNodeLoader;
+import at.petrak.bemis.impl.RecManNodeLoader;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
@@ -26,21 +27,23 @@ import java.io.IOException;
  *     <li>The book is loaded!</li>
  * </ol>
  */
-public class BemisBook {
-    protected BemisBookConfig config;
-    protected BemisIndex.Filled index;
+public final class BemisBook {
+    private ResourceLocation bookLoc;
+    private BemisBookConfig config;
+    private BemisIndex.Filled index;
 
     /**
      * Assumes that there's already an XML definer file checked for. Pass in the loc for the book, not the defn.
      */
-    public static BemisBook load(IXmlNodeLoader loader, ResourceLocation bookLoc) throws IOException {
+    public static BemisBook load(ResourceManager recman, ResourceLocation bookLoc) throws IOException {
+        var loaderabstr = new RecManNodeLoader(recman);
         var bookDefnPath = BemisApi.get().toBookDefiner(bookLoc);
-        var defnNode = loader.loadXml(bookDefnPath);
 
+        var defnNode = loaderabstr.loadXml(bookDefnPath);
         var cfg = BemisBookConfig.load(defnNode);
-        var skeleton = BemisIndex.Skeleton.load(loader, bookLoc);
 
-        BemisApi.LOGGER.info("use {} {}", cfg, skeleton);
+        var skeleton = BemisIndex.Skeleton.load(loaderabstr, bookLoc);
+
         throw new NotImplementedException();
     }
 }

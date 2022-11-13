@@ -7,7 +7,7 @@
     <shortcodes>
         <!-- You might go <verses nodefault="true"> if you want to not have the defaults -->
         <verses>
-            <example to="bemis:text"/>
+            <example to="bemis:paragraph"/>
         </verses>
     </shortcodes>
 </book>

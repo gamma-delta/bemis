@@ -1,6 +1,6 @@
 package at.petrak.bemis.api.book;
 
-import net.minecraft.util.Unit;
+import net.minecraft.resources.ResourceLocation;
 import org.w3c.dom.Node;
 
 /**
@@ -16,6 +16,6 @@ public abstract class BemisVerseType<T extends BemisVerse> {
      * <p>
      * A client world will be active at this time, so you can safely do things like access recipes.
      */
-    public abstract T load(Node node, BemisBookConfig config, BemisIndex<Unit> index,
+    public abstract T load(Node node, BemisBookConfig config, BemisIndex<ResourceLocation> index,
         String path) throws IllegalArgumentException;
 }
