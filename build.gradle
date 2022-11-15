@@ -15,6 +15,8 @@ plugins {
     // https://github.com/FabricMC/fabric-loom/issues/612#issuecomment-1198444120
     // Also it looks like property lookups don't work this early
     id 'fabric-loom' version '1.0-SNAPSHOT' apply false
+
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 import com.diluv.schoomp.Webhook
