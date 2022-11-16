@@ -2,6 +2,5 @@ package at.petrak.bemis.api.book;
 
 import java.util.List;
 
-public final class BemisPage {
-    List<BemisVerse> verses;
+public record BemisPage(String title, List<BemisVerse> verses) {
 }

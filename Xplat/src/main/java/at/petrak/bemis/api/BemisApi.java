@@ -1,13 +1,16 @@
 package at.petrak.bemis.api;
 
-import at.petrak.bemis.api.book.BemisVerseType;
+import at.petrak.bemis.api.book.BemisVerse;
 import com.google.common.base.Suppliers;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import org.asciidoctor.ast.Block;
+import org.asciidoctor.ast.StructuralNode;
+import org.asciidoctor.extension.BlockMacroProcessor;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -45,6 +48,11 @@ public class BemisApi {
     public static final String BOOK_DEFINER = "bemis.xml";
 
     /**
+     * The name of the special string Bemis uses to identify verse block macros.
+     */
+    public static final String BLOCK_MACRO_SENTINEL = "BEMIS_BLOCK_MACRO_SENTINEL";
+
+    /**
      * Get an instance of the Bemis API.
      */
     public static IBemisApi get() {
@@ -55,11 +63,6 @@ public class BemisApi {
      * The actual interface to the API.
      */
     public interface IBemisApi {
-        /**
-         * Get the registry for registering new verse types.
-         */
-        Registry<BemisVerseType<?>> getVerseTypeRegistry();
-
         /**
          * Returns the path to the folder defining the book with the given name. This doesn't do any validation;
          * it's simply text transformation.
@@ -100,5 +103,10 @@ public class BemisApi {
             var slicedPath = path.substring(BOOK_FOLDER.length() + 1, path.length() - BOOK_DEFINER.length() - 1);
             return new ResourceLocation(defnFilePath.getNamespace(), slicedPath);
         }
+
+        /**
+         * Convert a list of {@link BemisVerse}s into the form Bemis uses internally to identify verse-producing macros.
+         */
+        Block makeVerseMacroNode(BlockMacroProcessor self, StructuralNode parent, List<BemisVerse> verses);
     }
 }

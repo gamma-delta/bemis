@@ -1,9 +1,7 @@
 package at.petrak.bemis.xplat;
 
 import at.petrak.bemis.api.BemisApi;
-import at.petrak.bemis.api.book.BemisVerseType;
 import com.google.common.base.Suppliers;
-import net.minecraft.core.Registry;
 
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
@@ -26,8 +24,4 @@ public interface Xplat {
     static Xplat get() {
         return INSTANCE.get();
     }
-
-    //
-
-    Registry<BemisVerseType<?>> getVerseTypeRegistry();
 }

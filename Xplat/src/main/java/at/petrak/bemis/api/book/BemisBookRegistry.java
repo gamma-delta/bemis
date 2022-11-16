@@ -1,7 +1,6 @@
 package at.petrak.bemis.api.book;
 
 import at.petrak.bemis.api.BemisApi;
-import at.petrak.bemis.impl.RecManNodeLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.ApiStatus;
@@ -24,7 +23,7 @@ public final class BemisBookRegistry {
         bemises.forEach((defnPath, resource) -> {
             try {
                 var bookLoc = BemisApi.get().toBookLoc(defnPath);
-                BemisBook.load(new RecManNodeLoader(recman), bookLoc);
+                BemisBook.load(recman, bookLoc);
             } catch (Exception e) {
                 BemisApi.LOGGER.warn("An error occurred when loading the book at {}", defnPath);
                 BemisApi.LOGGER.warn("Error:", e);

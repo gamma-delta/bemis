@@ -3,8 +3,6 @@ package at.petrak.bemis.api.book;
 import at.petrak.bemis.api.BemisDrawCtx;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import java.io.Writer;
-
 /**
  * A section in a {@link BemisPage}, such as a block of text, an image, a crafting recipe...
  */
@@ -16,9 +14,4 @@ public interface BemisVerse {
      * @return the height in pixels this verse used up.
      */
     int draw(PoseStack ps, BemisDrawCtx ctx);
-
-    /**
-     * Render this to HTML somehow
-     */
-    void writeHTML(Writer htmlOut);
 }

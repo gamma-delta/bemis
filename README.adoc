@@ -1,0 +1,33 @@
+= Bemis
+
+All the docs you could ever want!
+All the docs you could ever need!
+
+Bemis is a mod for writing documentation.
+It's explicitly intended as a competitor to Patchouli.
+
+Why use Bemis?
+
+- Books are written in AsciiDoc, not JSON, and laid out like your files are laid out on disk.
+Stop writing text in a format designed for data, and start writing it in a **real markup language**!
+- First-class **export to HTML**, out of the box.
+- Extensible for developers.
+Easily add your own page elements and load them seamlessly.
+
+== For Developers
+
+Remember ABC:
+
+- **A**sciidoc.
+Bemis will find all the `.adoc` files, process their ASTs, and compose them into an index of pages.
+You can write AsciiDoctor-style preprocessors here too.
+
+- **B**emis.
+Bemis turns the Asciidoc AST nodes into a flat list of "verses." It comes with a set of pre-defined AST -> verse converters.
+You can also write and register your own.
+This is the part where things like crafting recipe displays are created.
+
+- **C**lient.
+Then, the client reads the docs.
+In-game, this is where verses get rendered to the screen.
+Or, they can read it in an HTML export.
