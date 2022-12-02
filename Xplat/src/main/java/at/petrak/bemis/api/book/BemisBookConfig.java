@@ -1,52 +1,35 @@
 package at.petrak.bemis.api.book;
 
-import at.petrak.bemis.api.XmlHelper;
-import net.minecraft.resources.ResourceLocation;
-import org.w3c.dom.Node;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static at.petrak.bemis.api.BemisApi.modLoc;
+import com.google.gson.JsonObject;
+import net.minecraft.util.GsonHelper;
 
 /**
  * Configuration for a book. This is what's loaded from {@code bemis.xml}.
  */
-public record BemisBookConfig(
-    String landing,
-    Map<String, ResourceLocation> verseShortcodes
-) {
-    public static BemisBookConfig load(Node node) {
-        var landing = "landing";
-        var verseShortcodes = defaultVerseShortcodes();
+public final class BemisBookConfig {
+    private String title;
+    private String landing;
 
-        var landingAtNode = XmlHelper.getXpath(node, "/book/landing/@at");
-        if (landingAtNode != null) {
-            landing = landingAtNode.getNodeValue();
-        }
-
-        var shortcodeVersesNode = XmlHelper.getXpath(node, "/book/shortcodes/verses");
-        if (shortcodeVersesNode != null) {
-            if (shortcodeVersesNode.getAttributes().getNamedItem("nodefault") != null) {
-                verseShortcodes.clear();
-            }
-
-            // Get the *non-text* nodes
-            var children = XmlHelper.getManyXpath(shortcodeVersesNode, "*");
-            for (var kid : children) {
-                var toVal = kid.getAttributes().getNamedItem("to");
-                if (toVal != null) {
-                    verseShortcodes.put(kid.getNodeName(), new ResourceLocation(toVal.getNodeValue()));
-                }
-            }
-        }
-
-        return new BemisBookConfig(landing, verseShortcodes);
+    public BemisBookConfig(
+        String title,
+        String landing
+    ) {
+        this.title = title;
+        this.landing = landing;
     }
 
-    public static HashMap<String, ResourceLocation> defaultVerseShortcodes() {
-        HashMap<String, ResourceLocation> verseShortcodes = new HashMap<>();
-        verseShortcodes.put("p", modLoc("paragraph"));
-        return verseShortcodes;
+    public static BemisBookConfig load(JsonObject json) {
+        var title = GsonHelper.getAsString(json, "title", "Give your book a title silly");
+        var landing = GsonHelper.getAsString(json, "landing", "landing");
+
+        return new BemisBookConfig(title, landing);
+    }
+
+    public String title() {
+        return title;
+    }
+
+    public String landing() {
+        return landing;
     }
 }

@@ -1,35 +1,39 @@
 package at.petrak.bemis;
 
-import at.petrak.bemis.api.IXmlNodeLoader;
-import at.petrak.bemis.api.XmlHelper;
+import at.petrak.bemis.api.IBemisResourceLoader;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
-import org.w3c.dom.Node;
+import net.minecraft.util.GsonHelper;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Loads nodes from the test resources.
  */
-public record TestResourceNodeLoader() implements IXmlNodeLoader {
+public record TestResourceNodeLoader() implements IBemisResourceLoader {
     @Override
-    public @Nullable Node loadXml(ResourceLocation location) {
+    public JsonObject loadJson(ResourceLocation location) throws IOException, JsonParseException {
         var path = toPath(location);
-        InputStream is;
-        try {
-            is = Files.newInputStream(path, StandardOpenOption.READ);
-        } catch (IOException e) {
-            return null;
-        }
-        return XmlHelper.loadNode(is);
+        var reader = Files.newBufferedReader(path, Charset.defaultCharset());
+        return GsonHelper.parse(reader);
+    }
+
+    @Override
+    public String loadFile(ResourceLocation location) throws IOException {
+        var path = toPath(location);
+        var reader = Files.newBufferedReader(path, Charset.defaultCharset());
+        var str = IOUtils.toString(reader);
+        reader.close();
+        return str;
     }
 
     @Override
@@ -43,7 +47,7 @@ public record TestResourceNodeLoader() implements IXmlNodeLoader {
         }
 
         try {
-            var stream = Files.walk(rootPath).filter(p -> p.toString().endsWith(".xml")).map(p -> {
+            var stream = Files.walk(rootPath).map(p -> {
                 // Presumably, this path will be a superstring of the rootpath
                 // .../assets/bemis/bemis_books/testbook -> .../assets/bemis/bemis_books/testbook/page.xml
                 var abs = p.toAbsolutePath();

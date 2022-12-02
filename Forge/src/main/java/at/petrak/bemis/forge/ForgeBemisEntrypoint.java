@@ -1,7 +1,7 @@
 package at.petrak.bemis.forge;
 
 import at.petrak.bemis.api.BemisApi;
-import at.petrak.bemis.api.book.BemisBookRegistry;
+import at.petrak.bemis.impl.BemisBookRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

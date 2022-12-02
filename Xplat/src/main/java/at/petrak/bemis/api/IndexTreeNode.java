@@ -1,5 +1,6 @@
 package at.petrak.bemis.api;
 
+import at.petrak.bemis.api.book.BemisBookPath;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,7 @@ public final class IndexTreeNode<T> {
         this(Optional.ofNullable(item), children);
     }
 
-     private IndexTreeNode(Optional<T> item, @Nullable Map<String, IndexTreeNode<T>> children) {
+    private IndexTreeNode(Optional<T> item, @Nullable Map<String, IndexTreeNode<T>> children) {
         this.item = item;
         this.children = children;
     }
@@ -47,18 +48,14 @@ public final class IndexTreeNode<T> {
      * <p>
      * Returns the new entry.
      */
-    public IndexTreeNode<T> insertAt(T item, String path) {
-        var splitted = path.split("/", 2);
-        if (splitted.length == 0) {
-            // then i really don't know what you're doing?
-            throw new IllegalStateException("attempted to insert " + item + "at the empty path");
-        } else if (splitted.length == 1) {
+    public IndexTreeNode<T> insertAt(T item, BemisBookPath path) {
+        if (path.size() == 1) {
             // Then this is the last segment! yahoo
             if (this.children == null) {
                 this.children = new HashMap<>();
             }
             var newEntry = new IndexTreeNode<>(item, null);
-            this.children.put(splitted[0], newEntry);
+            this.children.put(path.get(0), newEntry);
             return newEntry;
         } else {
             // recurse
@@ -67,9 +64,23 @@ public final class IndexTreeNode<T> {
             }
 
             var subentry = new IndexTreeNode<T>(Optional.empty(), new HashMap<>());
-            var out = subentry.insertAt(item, splitted[1]);
-            this.children.put(splitted[0], subentry);
+            var out = subentry.insertAt(item, path.popFront());
+            this.children.put(path.get(0), subentry);
             return out;
+        }
+    }
+
+    public @Nullable IndexTreeNode<T> get(BemisBookPath path) {
+        if (this.children == null)
+            return null;
+
+        var kid = this.children.get(path.get(0));
+        if (path.size() == 1) {
+            // then we're here
+            // may be null, that's ok
+            return kid;
+        } else {
+            return kid.get(path.popFront());
         }
     }
 

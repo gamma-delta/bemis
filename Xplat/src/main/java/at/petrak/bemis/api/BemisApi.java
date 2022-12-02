@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.StructuralNode;
 import org.asciidoctor.extension.BlockMacroProcessor;
+import org.asciidoctor.extension.JavaExtensionRegistry;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +44,19 @@ public class BemisApi {
 
     /**
      * The name of the file in a book folder that holds the book information. It's the only "special" file in a book
-     * folder; everything else is a page.
+     * folder; everything else is an adoc page.
      */
-    public static final String BOOK_DEFINER = "bemis.xml";
+    public static final String BOOK_DEFINER = "bemis.json";
 
     /**
      * The name of the special string Bemis uses to identify verse block macros.
      */
     public static final String BLOCK_MACRO_SENTINEL = "BEMIS_BLOCK_MACRO_SENTINEL";
+
+    /**
+     * The extension Bemis looks for to see if something's a file that should be loaded as a page.
+     */
+    public static final String PAGE_EXTENSION = ".adoc";
 
     /**
      * Get an instance of the Bemis API.
@@ -63,6 +69,7 @@ public class BemisApi {
      * The actual interface to the API.
      */
     public interface IBemisApi {
+
         /**
          * Returns the path to the folder defining the book with the given name. This doesn't do any validation;
          * it's simply text transformation.
@@ -89,7 +96,7 @@ public class BemisApi {
          * Returns the location of the book at the given definer XML file path. This doesn't do any validation;
          * it's simply text transformation.
          * <p>
-         * {@code foobar:bemis_books/a-book/bemis.xml} becomes {@code foobar:bemis_books/a-book}.
+         * {@code foobar:bemis_books/a-book/bemis.json} becomes {@code foobar:bemis_books/a-book}.
          * <p>
          * Returns null if it's invalid.
          */
@@ -108,5 +115,10 @@ public class BemisApi {
          * Convert a list of {@link BemisVerse}s into the form Bemis uses internally to identify verse-producing macros.
          */
         Block makeVerseMacroNode(BlockMacroProcessor self, StructuralNode parent, List<BemisVerse> verses);
+
+        /**
+         * Get the Java extension registry for the global AsciiDoctor instance.
+         */
+        JavaExtensionRegistry getJavaExtensionRegistry();
     }
 }

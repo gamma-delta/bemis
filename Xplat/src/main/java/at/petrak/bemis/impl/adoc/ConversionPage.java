@@ -1,4 +1,4 @@
-package at.petrak.bemis.adoc;
+package at.petrak.bemis.impl.adoc;
 
 import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.book.BemisVerse;

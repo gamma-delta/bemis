@@ -1,9 +1,9 @@
 package at.petrak.bemis;
 
-import at.petrak.bemis.adoc.BemisAdocConverter;
-import at.petrak.bemis.adoc.ConversionPage;
 import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.verses.TextVerse;
+import at.petrak.bemis.impl.adoc.BemisAdocConverter;
+import at.petrak.bemis.impl.adoc.ConversionPage;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Options;
 import org.asciidoctor.ast.StructuralNode;

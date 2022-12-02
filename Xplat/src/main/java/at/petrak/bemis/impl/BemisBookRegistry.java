@@ -1,11 +1,9 @@
-package at.petrak.bemis.api.book;
+package at.petrak.bemis.impl;
 
 import at.petrak.bemis.api.BemisApi;
-import at.petrak.bemis.impl.BookSkeleton;
-import at.petrak.bemis.impl.RecManNodeLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.jetbrains.annotations.ApiStatus;
+import org.asciidoctor.Asciidoctor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,10 +14,11 @@ import java.util.Map;
 public final class BemisBookRegistry {
     private static final Map<ResourceLocation, BookSkeleton> KNOWN_BOOKS = new HashMap<>();
 
+    public static final Asciidoctor ASCIIDOCTOR = Asciidoctor.Factory.create();
+
     /**
      * Load all the books from disc.
      */
-    @ApiStatus.Internal
     public static void scanAndLoadBooks(ResourceManager recman) {
         KNOWN_BOOKS.clear();
 

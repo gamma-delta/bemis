@@ -1,42 +1,57 @@
 package at.petrak.bemis.impl;
 
-import at.petrak.bemis.api.IXmlNodeLoader;
+import at.petrak.bemis.api.IBemisResourceLoader;
 import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.verses.ErrorVerse;
+import at.petrak.bemis.api.verses.TextVerse;
+import at.petrak.bemis.impl.adoc.ConversionPage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.asciidoctor.Options;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * Lazy-loaded page location and contents.
  */
 public class LazyPage {
-    public final ResourceLocation xmlLoc;
+    public final ResourceLocation fileLoc;
     protected @Nullable BemisPage page;
 
-    public LazyPage(ResourceLocation xmlLoc) {
-        this.xmlLoc = xmlLoc;
+    public LazyPage(ResourceLocation fileLoc) {
+        this.fileLoc = fileLoc;
         this.page = null;
     }
 
     /**
      * Lazily load the contents of the page.
      */
-    public BemisPage load(IXmlNodeLoader loader) {
+    public BemisPage load(IBemisResourceLoader loader) {
         if (this.page != null) return this.page;
 
-        var node = loader.loadXml(this.xmlLoc);
-        if (node == null) {
+        String src;
+        try {
+            src = loader.loadFile(this.fileLoc);
+        } catch (IOException exn) {
             return new BemisPage(
-                Component.literal("Unknown xml page " + this.xmlLoc),
+                Component.literal("Unknown file path" + this.fileLoc),
                 List.of());
         }
+
         try {
-            var page = BemisPage.load(node);
-            this.page = page;
-            return page;
+            var page = BemisBookRegistry.ASCIIDOCTOR.convert(src,
+                Options.builder().backend("bemis").toFile(false).build(),
+                ConversionPage.class);
+            if (page instanceof ConversionPage.Doc doc) {
+                this.page = doc.out;
+                return this.page;
+            } else {
+                return new BemisPage(
+                    Component.literal("Returned a ConversionPage.BodyPart somehow"),
+                    List.of(new TextVerse("howdja do that??")));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return new BemisPage(
