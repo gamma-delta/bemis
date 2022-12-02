@@ -16,7 +16,6 @@ public record BemisBookConfig(
     String landing,
     Map<String, ResourceLocation> verseShortcodes
 ) {
-
     public static BemisBookConfig load(Node node) {
         var landing = "landing";
         var verseShortcodes = defaultVerseShortcodes();

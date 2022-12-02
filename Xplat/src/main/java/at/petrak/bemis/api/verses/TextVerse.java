@@ -15,7 +15,7 @@ public class TextVerse implements BemisVerse {
         this.text = Component.literal(text);
     }
 
-    protected TextVerse(Component text) {
+    public TextVerse(Component text) {
         this.text = text;
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * The unique path to a page in a {@link BemisBook}.
+ * The unique path to a page in a {@link IBemisBook}.
  * <p>
  * Logically, this is a sequence of at least one <strong>segment</strong>, separated by slashes.
  * The segments are limited to lowercase characters, digits, dashes, underscores, and periods.

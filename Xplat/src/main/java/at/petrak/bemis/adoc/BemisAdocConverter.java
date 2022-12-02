@@ -5,6 +5,7 @@ import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.book.BemisVerse;
 import at.petrak.bemis.api.verses.ErrorVerse;
 import at.petrak.bemis.api.verses.TextVerse;
+import net.minecraft.network.chat.Component;
 import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.ContentNode;
 import org.asciidoctor.ast.Document;
@@ -34,22 +35,23 @@ public class BemisAdocConverter extends AbstractConverter<ConversionPage> {
                 try {
                     conved = this.convert(subnode, null, opts);
                 } catch (Exception e) {
-                    verses.add(new ErrorVerse("error in conversion: " + e.getMessage()));
+                    e.printStackTrace();
+                    verses.add(new TextVerse("Error when converting an ADoc node %s to a Verse:"));
+                    verses.add(new ErrorVerse(e));
                     continue;
                 }
 
                 if (conved instanceof ConversionPage.BodyPart bp) {
                     verses.addAll(bp.verses);
                 } else {
-                    verses.add(
-                        new ErrorVerse("node %s returned a Doc conversion page".formatted(subnode.getNodeName())));
+                    verses.add(new TextVerse("Error, node %s returned a Doc conversion page for some reason".formatted(subnode.getNodeName())));
                 }
             }
 
             // Gather information...
             final var title = document.getTitle();
 
-            return new ConversionPage.Doc(new BemisPage(title, verses));
+            return new ConversionPage.Doc(new BemisPage(Component.literal(title), verses));
         } else if (node instanceof Block block) {
             var kind = block.getNodeName();
             try {
@@ -60,14 +62,17 @@ public class BemisAdocConverter extends AbstractConverter<ConversionPage> {
                 if (kind.equals("paragraph")) {
                     return new ConversionPage.BodyPart(new TextVerse((String) block.getContent()));
                 } else {
-                    return new ConversionPage.BodyPart(new ErrorVerse("unknown block context " + kind));
+                    return new ConversionPage.BodyPart(new TextVerse("Error, unknown block context " + kind));
                 }
             } catch (Exception e) {
-                return new ConversionPage.BodyPart(new ErrorVerse(e.getMessage()));
+                e.printStackTrace();
+                return new ConversionPage.BodyPart(
+                    new TextVerse("A %s was thrown when converting a block:".formatted(e.getClass().getSimpleName())),
+                    new ErrorVerse(e));
             }
         } else {
             return new ConversionPage.BodyPart(
-                new ErrorVerse("tried to convert node of bad type " + node.getClass().getCanonicalName()));
+                new TextVerse("Error, tried to convert node of bad type " + node.getClass().getCanonicalName()));
         }
     }
 
