@@ -1,7 +1,9 @@
 package at.petrak.bemis.xplat;
 
 import at.petrak.bemis.api.BemisApi;
+import at.petrak.paucal.api.msg.PaucalMessage;
 import com.google.common.base.Suppliers;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
@@ -24,4 +26,6 @@ public interface Xplat {
     static Xplat get() {
         return INSTANCE.get();
     }
+
+    void sendPacketToPlayer(ServerPlayer target, PaucalMessage packet);
 }

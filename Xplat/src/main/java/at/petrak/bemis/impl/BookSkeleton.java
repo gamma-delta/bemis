@@ -53,14 +53,11 @@ public record BookSkeleton(ResourceLocation bookLoc, BemisBookConfig cfg, IndexT
             if (pathInBook.startsWith("/")) {
                 pathInBook = pathInBook.substring(1);
             }
-            var splitted = pathInBook.split("/");
 
             // Add the node to the skellyton
-            root.insertAt(path, new BemisBookPath(splitted[0], splitted));
+            root.insertAt(path, BemisBookPath.parse(pathInBook));
         }
 
         return root;
     }
-
-
 }

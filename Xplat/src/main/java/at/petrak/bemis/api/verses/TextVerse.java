@@ -12,7 +12,7 @@ public class TextVerse implements BemisVerse {
     protected final Component text;
 
     public TextVerse(String text) {
-        this.text = Component.literal(text);
+        this.text = Component.literal(text.replace("\n", " "));
     }
 
     public TextVerse(Component text) {
@@ -27,6 +27,7 @@ public class TextVerse implements BemisVerse {
         for (int i = 0; i < seq.size(); i++) {
             ctx.font().draw(ps, seq.get(i), 0f, i * vertKerning, 0xff_ffffff);
         }
-        return seq.size() * vertKerning;
+        // add one line's worth of padding
+        return (seq.size() + 1) * vertKerning;
     }
 }

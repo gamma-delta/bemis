@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Load XML nodes from the resource manager
  */
-public record RecManNodeLoader(ResourceManager recman) implements IBemisResourceLoader {
+public record RecManResourceLoader(ResourceManager recman) implements IBemisResourceLoader {
     @Override
     public JsonObject loadJson(ResourceLocation location) throws IOException, JsonParseException {
         var maybeResource = recman.getResource(location);

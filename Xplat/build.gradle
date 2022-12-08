@@ -8,11 +8,17 @@ minecraft {
     version(minecraftVersion)
 }
 
-repositories {}
+repositories {
+    mavenCentral()
+
+    maven { url 'https://maven.blamejared.com' }
+}
 
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: findBugsVersion
+
+    compileOnly "at.petra-k.paucal:paucal-common-$minecraftVersion:$paucalVersion"
 
     implementation "org.asciidoctor:asciidoctorj:${asciiDoctorJVersion}"
 
@@ -28,6 +34,7 @@ processResources {
 }
 
 test {
+    useJUnitPlatform()
     jvmArgs << ['--add-opens java.base/sun.nio.ch=ALL-UNNAMED', '--add-opens java.base/java.io=ALL-UNNAMED']
 }
 

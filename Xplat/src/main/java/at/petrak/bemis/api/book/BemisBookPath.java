@@ -1,6 +1,5 @@
 package at.petrak.bemis.api.book;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,12 +10,22 @@ import java.util.Objects;
  * Logically, this is a sequence of at least one <strong>segment</strong>, separated by slashes.
  * The segments are limited to lowercase characters, digits, dashes, underscores, and periods.
  * <p>
- * Note that there is *no* {@code .xml} suffix on any of these. Also note that a {@link BemisBookPath} means
+ * Note that there is *no* {@code .adoc} suffix on any of these. Also note that a {@link BemisBookPath} means
  * nothing not in the context of a given book.
  */
-@Immutable
 public final class BemisBookPath {
     private final List<String> segments;
+
+    public static BemisBookPath parse(String splittee) throws IllegalArgumentException {
+        var splitted = List.of(splittee.split("/"));
+        for (int i = 0; i < splitted.size(); i++) {
+            var s = splitted.get(i);
+            if (!isValidSegment(s)) {
+                throw new IllegalArgumentException("string at idx " + (i + 1) + ", " + s + ", had an invalid char");
+            }
+        }
+        return new BemisBookPath(splitted);
+    }
 
     public BemisBookPath(String first, String... more) throws IllegalArgumentException {
         if (!isValidSegment(first)) {

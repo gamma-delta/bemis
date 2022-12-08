@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static at.petrak.bemis.api.BemisApi.modLoc;
 
@@ -23,5 +24,9 @@ public class BemisRegistrar {
             throw new IllegalArgumentException("Typo? Duplicate id " + id);
         }
         return item;
+    }
+
+    public static void registerItems(BiConsumer<ResourceLocation, Item> consumer) {
+        ITEMS.forEach(consumer);
     }
 }

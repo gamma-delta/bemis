@@ -6,9 +6,9 @@ import at.petrak.bemis.api.book.BemisVerse;
 import at.petrak.bemis.api.verses.ErrorVerse;
 import at.petrak.bemis.api.verses.TextVerse;
 import net.minecraft.network.chat.Component;
-import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.ContentNode;
 import org.asciidoctor.ast.Document;
+import org.asciidoctor.ast.StructuralNode;
 import org.asciidoctor.converter.AbstractConverter;
 import org.asciidoctor.converter.ConverterFor;
 
@@ -26,53 +26,55 @@ public class BemisAdocConverter extends AbstractConverter<ConversionPage> {
     @Override
     public ConversionPage convert(ContentNode node, String maybeTransform, Map<Object, Object> opts) {
         // The automatic "forward via getContent" seems to only want to do strings.
-        if (node instanceof Document document) {
-            var subnodes = document.getBlocks();
+        if (node instanceof StructuralNode struct) {
+            var subnodes = struct.getBlocks();
             var verses = new ArrayList<BemisVerse>();
 
-            for (var subnode : subnodes) {
-                ConversionPage conved;
-                try {
-                    conved = this.convert(subnode, null, opts);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    verses.add(new TextVerse("Error when converting an ADoc node %s to a Verse:"));
-                    verses.add(new ErrorVerse(e));
-                    continue;
+            if (subnodes.isEmpty()) {
+                // this is a leaf node with text
+                var ctx = struct.getContext();
+                if (struct.hasAttribute(BemisApi.BLOCK_MACRO_SENTINEL)) {
+                    return (ConversionPage.BodyPart) struct.getAttribute(BemisApi.BLOCK_MACRO_SENTINEL);
                 }
 
-                if (conved instanceof ConversionPage.BodyPart bp) {
-                    verses.addAll(bp.verses);
+                // https://docs.asciidoctor.org/asciidoc/latest/blocks/
+                if (ctx.equals("paragraph")) {
+                    return new ConversionPage.BodyPart(new TextVerse((String) struct.getContent()));
                 } else {
-                    verses.add(new TextVerse("Error, node %s returned a Doc conversion page for some reason".formatted(subnode.getNodeName())));
+                    return new ConversionPage.BodyPart(new TextVerse("Error, unknown block context " + ctx));
+                }
+            } else {
+                for (var subnode : subnodes) {
+                    ConversionPage conved;
+                    try {
+                        conved = this.convert(subnode, null, opts);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        verses.add(new ErrorVerse("Error when converting an ADoc node `%s` to a verse:".formatted(subnode.getNodeName()), e));
+                        continue;
+                    }
+
+                    if (conved instanceof ConversionPage.BodyPart bp) {
+                        verses.addAll(bp.verses);
+                    } else {
+                        verses.add(new TextVerse("Error, node %s returned a Doc conversion page for some reason".formatted(subnode.getNodeName())));
+                    }
                 }
             }
 
-            // Gather information...
-            final var title = document.getTitle();
+            if (struct instanceof Document document) {
+                // we were at the top level!
+                // Gather information...
+                final var title = document.getTitle();
 
-            return new ConversionPage.Doc(new BemisPage(Component.literal(title), verses));
-        } else if (node instanceof Block block) {
-            var kind = block.getNodeName();
-            try {
-                if (block.hasAttribute(BemisApi.BLOCK_MACRO_SENTINEL)) {
-                    return (ConversionPage.BodyPart) block.getAttribute(BemisApi.BLOCK_MACRO_SENTINEL);
-                }
-
-                if (kind.equals("paragraph")) {
-                    return new ConversionPage.BodyPart(new TextVerse((String) block.getContent()));
-                } else {
-                    return new ConversionPage.BodyPart(new TextVerse("Error, unknown block context " + kind));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new ConversionPage.BodyPart(
-                    new TextVerse("A %s was thrown when converting a block:".formatted(e.getClass().getSimpleName())),
-                    new ErrorVerse(e));
+                return new ConversionPage.Doc(new BemisPage(Component.literal(title), verses));
+            } else {
+                // this is at a non-top-level
+                return new ConversionPage.BodyPart(verses);
             }
         } else {
-            return new ConversionPage.BodyPart(
-                new TextVerse("Error, tried to convert node of bad type " + node.getClass().getCanonicalName()));
+            return new ConversionPage.BodyPart(new TextVerse(
+                "Error: we don't know how to process non-StructuralNodes (found %s)".formatted(node.getClass().getSimpleName())));
         }
     }
 

@@ -4,7 +4,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
 public class ErrorVerse extends TextVerse {
-    public ErrorVerse(Exception e) {
-        super(Component.literal("An exception was thrown :(\n" + e.getMessage()).withStyle(ChatFormatting.DARK_RED));
+    public ErrorVerse(String msg, Exception e) {
+        super(Component.literal("%s: %s was thrown \n%s".formatted(msg, e.getClass().getSimpleName(), e.getMessage()))
+            .withStyle(ChatFormatting.DARK_RED));
     }
 }

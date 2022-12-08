@@ -3,8 +3,14 @@ plugins {
     id 'maven-publish'
     id 'idea'
 }
+apply plugin: "com.github.johnrengelman.shadow"
 
 archivesBaseName = getArtifactID("fabric")
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
 
 loom {
     runs {
@@ -36,16 +42,32 @@ loom {
 
 repositories {
     maven { url "https://libraries.minecraft.net" }
+    // paucal
+    maven { url "https://maven.blamejared.com" }
+    // emi
+    maven { url "https://maven.terraformersmc.com/" }
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.officialMojangMappings()
 
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: findBugsVersion
+
+    compileOnly project(":Xplat")
+    shade "org.asciidoctor:asciidoctorj:${asciiDoctorJVersion}"
+
     modImplementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricVersion}"
 
-    compileOnly project(":Xplat")
+    modImplementation "at.petra-k.paucal:paucal-fabric-$minecraftVersion:$paucalVersion"
+    // which requires fiber
+    // i don't know why it's not included
+    modImplementation "me.zeroeightsix:fiber:$fiberVersion"
+
+    modImplementation "dev.emi:emi:${emiVersion}"
+
+//    testCompileOnly "org.asciidoctor:asciidoctorj:${asciiDoctorJVersion}"
 }
 
 sourceSets {
@@ -66,3 +88,18 @@ processResources {
 }
 
 setupJar(this)
+jar.archiveClassifier = 'slim'
+
+shadowJar {
+    archiveClassifier = 'shadow'
+    configurations = [project.configurations.shade]
+    relocate 'org.asciidoctor', "at.petrak.relocated.asciidoctor"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    inputFile.set(shadowJar.archiveFile)
+    archiveClassifier = ''
+
+    from rootProject.file("LICENSE.md")
+}

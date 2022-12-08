@@ -1,36 +1,34 @@
 {
-    "schemaVersion": 1,
-    "id": "modid",
-    "version": "${version}",
-
-    "name": "Mr. Bemis",
-    "description": "All the docs I could ever want! All the docs I could ever need!",
-    "authors": [
-        "petrak@"
+  "schemaVersion": 1,
+  "id": "modid",
+  "version": "${version}",
+  "name": "Bemis",
+  "description": "All the docs I could ever want! All the docs I could ever need!",
+  "authors": [
+    "petrak@"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "at.petrak.bemis.fabric.FabricBemisEntrypoint"
     ],
-    "contact": {
-        "homepage": "https://fabricmc.net/",
-        "sources": "https://github.com/FabricMC/fabric-example-mod"
-    },
-
-    "license": "MIT",
-    "icon": "icon.png",
-
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "at.petrak.bemis.fabric.FabricBemisEntrypoint"
-        ]
-    },
-    "mixins": [
-        "bemis.mixins.json"
-    ],
-
-    "depends": {
-        "fabricloader": ">=0.14",
-        "fabric": "*",
-        "minecraft": "1.19.x",
-        "java": ">=17"
-    }
+    "client": [
+      "at.petrak.bemis.fabric.FabricBemisClientEntrypoint"
+    ]
+  },
+  "mixins": [
+  ],
+  "depends": {
+    "fabricloader": ">=0.14",
+    "fabric": "*",
+    "minecraft": "1.19.x",
+    "java": ">=17"
+  }
 }
   

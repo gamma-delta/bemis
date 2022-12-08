@@ -1,5 +1,6 @@
 package at.petrak.bemis.api;
 
+import at.petrak.bemis.api.book.BemisBook;
 import at.petrak.bemis.api.book.BemisVerse;
 import com.google.common.base.Suppliers;
 import net.minecraft.resources.ResourceLocation;
@@ -120,5 +121,7 @@ public class BemisApi {
          * Get the Java extension registry for the global AsciiDoctor instance.
          */
         JavaExtensionRegistry getJavaExtensionRegistry();
+
+        @Nullable BemisBook getBook(ResourceLocation bookLoc);
     }
 }

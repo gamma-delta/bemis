@@ -8,11 +8,11 @@ import net.minecraft.util.GsonHelper;
  */
 public final class BemisBookConfig {
     private String title;
-    private String landing;
+    private BemisBookPath landing;
 
     public BemisBookConfig(
         String title,
-        String landing
+        BemisBookPath landing
     ) {
         this.title = title;
         this.landing = landing;
@@ -22,14 +22,14 @@ public final class BemisBookConfig {
         var title = GsonHelper.getAsString(json, "title", "Give your book a title silly");
         var landing = GsonHelper.getAsString(json, "landing", "landing");
 
-        return new BemisBookConfig(title, landing);
+        return new BemisBookConfig(title, BemisBookPath.parse(landing));
     }
 
     public String title() {
         return title;
     }
 
-    public String landing() {
+    public BemisBookPath landing() {
         return landing;
     }
 }

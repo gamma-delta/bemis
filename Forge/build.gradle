@@ -13,10 +13,17 @@ buildscript {
     }
 }
 
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
 archivesBaseName = getArtifactID("forge")
+
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
 
 minecraft {
     mappings channel: 'official', version: minecraftVersion
@@ -31,7 +38,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
-                modClientRun {
+                create(modID) {
                     source sourceSets.main
                     source project(":Xplat").sourceSets.main
                 }
@@ -45,7 +52,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
-                modServerRun {
+                create(modID) {
                     source sourceSets.main
                     source project(":Xplat").sourceSets.main
                 }
@@ -105,10 +112,13 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraftVersion}-${forgeVersion}"
     compileOnly project(":Xplat")
 
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: findBugsVersion
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     compileOnly fg.deobf("at.petra-k.paucal:paucal-forge-$minecraftVersion:$paucalVersion")
     runtimeOnly fg.deobf("at.petra-k.paucal:paucal-forge-$minecraftVersion:$paucalVersion")
+
+    shade "org.asciidoctor:asciidoctorj:${asciiDoctorJVersion}"
 }
 
 /*
@@ -118,6 +128,10 @@ mixin {
     config "hexcasting_forge.mixins.json"
 }
 */
+
+sourcesJar {
+    from project(":Xplat").sourceSets.main.allJava
+}
 
 tasks.withType(JavaCompile) {
     source(project(":Xplat").sourceSets.main.allSource)
@@ -131,5 +145,26 @@ sourceSets {
     main.resources.srcDirs += ['src/generated/resources', '../Xplat/src/generated/resources']
 }
 
-jar.finalizedBy('reobfJar')
+build {
+    println "Forcing re-compile of Java to include refmap"
+    tasks.withType(JavaCompile) {
+        outputs.upToDateWhen { false }
+    }
+}
+
 setupJar(this)
+
+jar.archiveClassifier = 'slim'
+
+shadowJar {
+    archiveClassifier = ''
+    configurations = [project.configurations.shade]
+    relocate 'org.asciidoctor', "at.petrak.relocated.nightconfig"
+    finalizedBy 'reobfShadowJar'
+}
+
+assemble.dependsOn shadowJar
+
+reobf {
+    shadowJar {}
+}
