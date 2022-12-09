@@ -123,5 +123,64 @@ public class BemisApi {
         JavaExtensionRegistry getJavaExtensionRegistry();
 
         @Nullable BemisBook getBook(ResourceLocation bookLoc);
+
+        /**
+         * AsciiDoctorJ automatically converts some characters (like {@code &} and {@code "}) to XML-style character
+         * escapes.
+         * <p>
+         * Call this to un-do that.
+         * <p>
+         * See <a href=https://docs.asciidoctor.org/asciidoc/latest/subs/>the AsciiDoctor</a> docs.
+         */
+        default String unsubstituteAdoc(String raw) {
+            var bob = new StringBuilder();
+
+            var anchor = 0;
+            for (int i = 0; i < raw.length() - 1; i++) {
+                if (raw.charAt(i) == '&' && raw.charAt(i + 1) == '#') {
+                    var endIdx = raw.indexOf(';', i + 2);
+                    if (endIdx == -1) {
+                        // i question what you're doing
+                        break;
+                    }
+
+                    bob.append(raw, anchor, i);
+                    // Skip the ending `;`
+                    anchor = endIdx + 1;
+
+                    // skip the &#
+                    var refInnards = raw.substring(i + 2, endIdx);
+
+                    try {
+                        int ch;
+                        if (refInnards.startsWith("x")) {
+                            // hex literal
+                            ch = Integer.parseInt(refInnards, 1, refInnards.length(), 16);
+                        } else {
+                            // dec literal
+                            ch = Integer.parseInt(refInnards);
+                        }
+
+                        // Ignore certain chars that minecraft doesn't like
+                        if (ch == 0x200b) {
+                            // zero-width, do nothing
+                        } else if (ch == 0x00a0) {
+                            // non-breaking space, ignore the non-breaking
+                            bob.append(' ');
+                        } else {
+                            bob.append((char) ch);
+                        }
+                    } catch (NumberFormatException ignored) {
+                        // then just don't add anything
+                    }
+
+                    // skip past this whole dealio and keep parsing from there
+                    i = endIdx;
+                }
+            }
+
+            bob.append(raw, anchor, raw.length());
+            return bob.toString();
+        }
     }
 }

@@ -2,7 +2,6 @@ package at.petrak.bemis.impl;
 
 import at.petrak.bemis.api.IBemisResourceLoader;
 import at.petrak.bemis.api.book.BemisPage;
-import at.petrak.bemis.api.verses.ErrorVerse;
 import at.petrak.bemis.api.verses.TextVerse;
 import at.petrak.bemis.impl.adoc.ConversionPage;
 import net.minecraft.network.chat.Component;
@@ -40,24 +39,16 @@ public class LazyPage {
                 List.of());
         }
 
-        try {
-            var page = BemisBookRegistry.ASCIIDOCTOR.convert(src,
-                Options.builder().backend("bemis").toFile(false).build(),
-                ConversionPage.class);
-            if (page instanceof ConversionPage.Doc doc) {
-                this.page = doc.out;
-                return this.page;
-            } else {
-                return new BemisPage(
-                    Component.literal("Returned a ConversionPage.BodyPart somehow"),
-                    List.of(new TextVerse("howdja do that??")));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        var page = BemisBookRegistry.ASCIIDOCTOR.convert(src,
+            Options.builder().backend("bemis").toFile(false).build(),
+            ConversionPage.class);
+        if (page instanceof ConversionPage.Doc doc) {
+            this.page = doc.out;
+            return this.page;
+        } else {
             return new BemisPage(
-                Component.literal(e.getClass().getSimpleName()),
-                List.of(new ErrorVerse(e))
-            );
+                Component.literal("Returned a ConversionPage.BodyPart somehow"),
+                List.of(new TextVerse("howdja do that??")));
         }
     }
 
