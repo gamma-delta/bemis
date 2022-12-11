@@ -163,7 +163,7 @@ public class BemisApi {
 
                         // Ignore certain chars that minecraft doesn't like
                         if (ch == 0x200b) {
-                            // zero-width, do nothing
+                            // zero-width space, do nothing
                         } else if (ch == 0x00a0) {
                             // non-breaking space, ignore the non-breaking
                             bob.append(' ');

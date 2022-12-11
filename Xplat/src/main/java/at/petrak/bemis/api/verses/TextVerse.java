@@ -4,6 +4,7 @@ import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.BemisDrawCtx;
 import at.petrak.bemis.api.book.BemisVerse;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -14,7 +15,8 @@ public class TextVerse implements BemisVerse {
     protected final float scale;
 
     public TextVerse(String text) {
-        this(Component.literal(BemisApi.get().unsubstituteAdoc(text.replace("\n", " "))),
+        this(Component.literal(BemisApi.get().unsubstituteAdoc(text.replace("\n", " ")))
+                .withStyle(ChatFormatting.BLACK),
             1.0f);
     }
 
