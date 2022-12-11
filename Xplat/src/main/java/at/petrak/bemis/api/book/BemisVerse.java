@@ -11,7 +11,20 @@ public interface BemisVerse {
      * Render this to the screen. The {@link PoseStack} is set up such that {@code 0,0} is the top-left corner of the
      * writable area this verse is entitled to.
      *
-     * @return the height in pixels this verse used up.
+     * @return the height in pixels this verse used up. A given instance of a verse MUST return the same
+     * height every time this is called, or bad things will happen.
      */
     int draw(PoseStack ps, BemisDrawCtx ctx);
+
+    /**
+     * Called when the user clicks on this verse. The default implementation is a no-op.
+     *
+     * @param cornerX The screen-space X position of the top-left corner of the verse
+     * @param cornerY The screen-space Y position of the top-left corner of the verse
+     * @param mouseX  The screen-space X position of the mouse pos
+     * @param mouseY  The screen-space X position of the mouse pos
+     * @param button  Which mouse button was pressed
+     */
+    default void onClick(int cornerX, int cornerY, double mouseX, double mouseY, int button) {
+    }
 }

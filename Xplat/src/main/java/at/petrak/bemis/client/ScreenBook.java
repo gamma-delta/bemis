@@ -9,6 +9,9 @@ import at.petrak.bemis.api.book.BemisVerse;
 import at.petrak.bemis.impl.RecManResourceLoader;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -19,6 +22,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 import java.util.List;
+import java.util.function.ObjIntConsumer;
 
 import static at.petrak.bemis.api.BemisApi.modLoc;
 
@@ -48,7 +52,6 @@ public class ScreenBook extends Screen {
         this.path = book.getConfig().landing();
         // TODO: per-book backgrounds
         this.backgroundTex = modLoc("textures/gui/book.png");
-        this.scrollDepth = 0;
     }
 
     protected void updatePageToPath() {
@@ -73,7 +76,6 @@ public class ScreenBook extends Screen {
 
     @Override
     public void render(PoseStack ps, int mx, int my, float partialTicks) {
-        this.renderBackground(ps);
         this.renderBookBacking(ps);
 
         super.render(ps, mx, my, partialTicks);
@@ -86,6 +88,11 @@ public class ScreenBook extends Screen {
         int x = (this.width - letterboxedW) / 2;
         int y = (this.height - letterboxedH) / 2;
 
+        ps.pushPose();
+        ps.translate(0, 0, -100);
+        this.fillGradient(ps, 0, 0, this.width, this.height, 0xc0_101010, 0xd0_101010);
+
+        ps.translate(0, 0, 1);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, this.backgroundTex);
@@ -93,14 +100,42 @@ public class ScreenBook extends Screen {
             x, y, letterboxedW, letterboxedH, // x, y, w, h
             0, 0, BOOK_TEX_WIDTH, BOOK_TEX_HEIGHT, // u, v, uw, vh
             256, 256); // texture size
+
+        ps.popPose();
     }
 
     public class VersesWidget extends AbstractWidget {
-        protected int scrollDepth = 0;
-        protected int knownContentHeight = -1;
+        protected Int2ObjectSortedMap<BemisVerse> verseHeights;
+        protected int scrollDepth;
+        protected int knownContentHeight;
 
         public VersesWidget(int $$0, int $$1, int $$2, int $$3, Component $$4) {
             super($$0, $$1, $$2, $$3, $$4);
+
+            this.scrollDepth = 0;
+
+            // according to wikipedia, AVL is faster than RB in lookup-heavy applications
+            // we construct once and lookup a bunch so that seems right
+            // granted, the lookups gonna be like, 10 long, but whatever
+            this.verseHeights = new Int2ObjectAVLTreeMap<>();
+
+            var dummyPs = new PoseStack();
+            dummyPs.translate(-999999, -999999, 0);
+
+            int cursorDown = 0;
+            var ctx = this.makeDrawCtx();
+
+            for (var verse : ScreenBook.this.currentPage.verses()) {
+                this.verseHeights.put(cursorDown, verse);
+                int dy = verse.draw(dummyPs, ctx);
+                cursorDown += dy;
+                ctx.y += dy;
+            }
+            this.knownContentHeight = cursorDown;
+        }
+
+        protected BemisDrawCtx makeDrawCtx() {
+            return new BemisDrawCtx(ScreenBook.this.minecraft.font, this.width, this.x, this.y - this.scrollDepth);
         }
 
         @Override
@@ -121,52 +156,67 @@ public class ScreenBook extends Screen {
         }
 
         @Override
-        public void render(PoseStack ps, int mx, int my, float partialTicks) {
-            var ctx = new BemisDrawCtx(ScreenBook.this.minecraft.font, this.width);
+        public boolean mouseClicked(double mx, double my, int btn) {
+            double scrollSpaceY = my - this.y + this.scrollDepth;
+            var onesBelow = this.verseHeights.headMap(Mth.ceil(scrollSpaceY));
+            if (!onesBelow.isEmpty()) {
+                var lastKey = onesBelow.lastIntKey();
+                var last = onesBelow.get(lastKey);
+                var screenSpaceY = lastKey - this.scrollDepth;
+                last.onClick(this.x, screenSpaceY, mx, my, btn);
+            }
 
-            // Scissor-space is lower-left, window-pixel space
-            // see forge's ScrollPanel
-            {
+            return true;
+        }
+
+        @Override
+        public void render(PoseStack ps, int mx, int my, float partialTicks) {
+
+            // Draw everything below the scroll pos, plus the one before it
+            if (!this.verseHeights.isEmpty()) {
+                var ctx = this.makeDrawCtx();
+
+                // Scissor-space is lower-left, window-pixel space
+                // see forge's ScrollPanel
                 double scale = ScreenBook.this.minecraft.getWindow().getGuiScale();
                 RenderSystem.enableScissor(
                     (int) (this.x * scale),
                     ScreenBook.this.minecraft.getWindow().getHeight() - (int) ((this.y + this.height) * scale),
                     (int) (this.width * scale),
                     (int) (this.height * scale));
+
                 ps.pushPose();
                 ps.translate(this.x, this.y, 0);
                 ps.translate(0, -this.scrollDepth, 0);
-            }
 
-            int cursorDown = 0;
+                var before = this.verseHeights.headMap(this.scrollDepth);
+                var after = this.verseHeights.tailMap(this.scrollDepth);
 
-            List<BemisVerse> verses = ScreenBook.this.currentPage.verses();
-            for (int i = 0; i < verses.size(); i++) {
-                BemisVerse verse = verses.get(i);
-                ps.pushPose();
-                ps.translate(0, cursorDown, 0);
+                ObjIntConsumer<BemisVerse> draw = (verse, y) -> {
+                    ps.pushPose();
+                    ps.translate(0, y, 0);
 
-                var dy = verse.draw(ps, ctx);
+                    var dy = verse.draw(ps, ctx);
+                    if (Screen.hasAltDown()) {
+                        ps.translate(0, 0, -1);
+                        RenderHelper.renderColorQuad(ps, 0, 0, this.width, dy, verse.hashCode() | 0xff_303030);
+                    }
 
-                if (Screen.hasAltDown()) {
-                    // mix the colors a little
-                    RenderHelper.renderColorQuad(ps, 0, 0, this.width, dy,
-                        Double.hashCode(Mth.sin(i + 1)) | 0xff_000000);
+                    ps.popPose();
+                    ctx.y = y + dy - this.scrollDepth + this.y;
+                };
+
+                if (!before.isEmpty()) {
+                    var lastKey = before.lastIntKey();
+                    var lastVerse = before.get(lastKey);
+                    draw.accept(lastVerse, lastKey);
                 }
-
-                cursorDown += dy;
+                after.forEach((y, verse) -> draw.accept(verse, y));
 
                 ps.popPose();
+                RenderSystem.disableScissor();
             }
 
-            ps.popPose();
-            RenderSystem.disableScissor();
-
-            this.knownContentHeight = cursorDown;
-
-            minecraft.font.draw(ps, "CD: %d  SD: %d  H: %d -- SD+H: %d".formatted(
-                    cursorDown, this.scrollDepth, this.height, this.scrollDepth + this.height),
-                0, 0, -1);
         }
 
         @Override

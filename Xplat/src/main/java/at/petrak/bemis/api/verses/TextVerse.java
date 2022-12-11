@@ -25,15 +25,14 @@ public class TextVerse implements BemisVerse {
         this.scale = scale;
     }
 
-
     @Override
     public int draw(PoseStack ps, BemisDrawCtx ctx) {
-        var seq = ctx.font().split(this.text, Math.round(ctx.width() / this.scale));
-        var vertKerning = ctx.font().lineHeight + 2;
+        var seq = ctx.font.split(this.text, Math.round(ctx.width / this.scale));
+        var vertKerning = ctx.font.lineHeight + 2;
         ps.pushPose();
         ps.scale(this.scale, this.scale, 1f);
         for (int i = 0; i < seq.size(); i++) {
-            ctx.font().draw(ps, seq.get(i), 0f, i * vertKerning, 0xff_ffffff);
+            ctx.font.draw(ps, seq.get(i), 0f, i * vertKerning, 0xff_ffffff);
         }
         ps.popPose();
         // add one line's worth of padding

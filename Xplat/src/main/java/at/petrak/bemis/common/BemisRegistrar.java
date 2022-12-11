@@ -13,9 +13,8 @@ import static at.petrak.bemis.api.BemisApi.modLoc;
 public class BemisRegistrar {
     public static final Map<ResourceLocation, Item> ITEMS = new LinkedHashMap<>();
 
-
-    public static final ItemBook BOOK = item("book",
-        new ItemBook(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_MISC)));
+    public static final ItemFromNbtBook BOOK = item("book",
+        new ItemFromNbtBook(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_MISC)));
 
     private static <T extends Item> T item(String path, T item) {
         var id = modLoc(path);
