@@ -1,6 +1,7 @@
 package at.petrak.bemis.api;
 
 import at.petrak.bemis.api.book.BemisBook;
+import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.book.BemisVerse;
 import com.google.common.base.Suppliers;
 import net.minecraft.resources.ResourceLocation;
@@ -194,5 +195,10 @@ public class BemisApi {
             bob.append(raw, anchor, raw.length());
             return bob.toString();
         }
+
+        /**
+         * Convert a source string to a page.
+         */
+        BemisPage loadString(String adocSrc);
     }
 }

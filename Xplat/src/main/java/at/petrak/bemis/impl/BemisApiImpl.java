@@ -2,7 +2,9 @@ package at.petrak.bemis.impl;
 
 import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.book.BemisBook;
+import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.book.BemisVerse;
+import at.petrak.bemis.impl.adoc.BemisAdocConverter;
 import at.petrak.bemis.impl.adoc.ConversionPage;
 import at.petrak.bemis.impl.adoc.SneakyLiteralVerses;
 import net.minecraft.resources.ResourceLocation;
@@ -36,5 +38,20 @@ public class BemisApiImpl implements BemisApi.IBemisApi {
             return null;
 
         return new BemisBookImpl(bookLoc, skeleton.cfg(), skeleton.index().map(LazyPage::new));
+    }
+
+    @Override
+    public BemisPage loadString(String adocSrc) {
+        // if anyone knows of a better way of doing this,
+        // god please, I am dying to know
+        var out = new BemisAdocConverter.Out();
+        BemisBookRegistry.ASCIIDOCTOR.convert(adocSrc,
+            Options.builder()
+                .backend("bemis")
+                .toFile(false)
+                .option(BemisApi.OUTPUT_SMUGGLING_SENTINEL, out)
+                .build(),
+            BemisPage.class);
+        return out.getPage();
     }
 }

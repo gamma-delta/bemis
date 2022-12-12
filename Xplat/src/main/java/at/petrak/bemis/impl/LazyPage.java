@@ -4,10 +4,8 @@ import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.IBemisResourceLoader;
 import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.verses.ErrorVerse;
-import at.petrak.bemis.impl.adoc.BemisAdocConverter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.asciidoctor.Options;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -40,16 +38,8 @@ public class LazyPage {
                 List.of(new ErrorVerse("IO exception at " + this.fileLoc, exn)));
         }
 
-        // God bless the garbage collector
-        var out = new BemisAdocConverter.Out();
-        BemisBookRegistry.ASCIIDOCTOR.convert(src,
-            Options.builder()
-                .backend("bemis")
-                .toFile(false)
-                .option(BemisApi.OUTPUT_SMUGGLING_SENTINEL, out)
-                .build(),
-            BemisPage.class);
-        return this.page = out.getPage();
+        this.page = BemisApi.get().loadString(src);
+        return this.page;
     }
 
     /**
