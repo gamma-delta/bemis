@@ -6,6 +6,7 @@ import at.petrak.bemis.api.book.BemisBook;
 import at.petrak.bemis.api.book.BemisBookConfig;
 import at.petrak.bemis.api.book.BemisBookPath;
 import at.petrak.bemis.api.book.BemisPage;
+import at.petrak.bemis.api.verses.ErrorVerse;
 import at.petrak.bemis.api.verses.TextVerse;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -45,7 +46,7 @@ public class BemisBookImpl extends BemisBook {
         if (tree == null || tree.item().isEmpty()) {
             return new BemisPage(
                 Component.literal("Nothing here?"),
-                List.of(new TextVerse("There's no page at the path " + path))
+                List.of(new ErrorVerse("There's no page at the path " + path))
             );
         }
         var lazy = tree.item().get();

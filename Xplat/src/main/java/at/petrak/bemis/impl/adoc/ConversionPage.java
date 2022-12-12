@@ -33,5 +33,27 @@ abstract public sealed class ConversionPage {
         public BodyPart(BemisVerse... verses) {
             this.verses = List.of(verses);
         }
+
+        @Override
+        public String toString() {
+            return super.toString();
+        }
+    }
+
+    public static final class Phrase extends ConversionPage {
+        public final List<BemisVerse> verses;
+
+        public Phrase(List<BemisVerse> verses) {
+            this.verses = verses;
+        }
+
+        public Phrase(BemisVerse... verses) {
+            this.verses = List.of(verses);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString();
+        }
     }
 }

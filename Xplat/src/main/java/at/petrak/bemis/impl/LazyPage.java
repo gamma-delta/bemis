@@ -1,9 +1,10 @@
 package at.petrak.bemis.impl;
 
+import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.IBemisResourceLoader;
 import at.petrak.bemis.api.book.BemisPage;
-import at.petrak.bemis.api.verses.TextVerse;
-import at.petrak.bemis.impl.adoc.ConversionPage;
+import at.petrak.bemis.api.verses.ErrorVerse;
+import at.petrak.bemis.impl.adoc.BemisAdocConverter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.asciidoctor.Options;
@@ -35,21 +36,20 @@ public class LazyPage {
             src = loader.loadFile(this.fileLoc);
         } catch (IOException exn) {
             return new BemisPage(
-                Component.literal("Unknown file path" + this.fileLoc),
-                List.of());
+                Component.literal("IO exception " + this.fileLoc),
+                List.of(new ErrorVerse("IO exception at " + this.fileLoc, exn)));
         }
 
-        var page = BemisBookRegistry.ASCIIDOCTOR.convert(src,
-            Options.builder().backend("bemis").toFile(false).build(),
-            ConversionPage.class);
-        if (page instanceof ConversionPage.Doc doc) {
-            this.page = doc.out;
-            return this.page;
-        } else {
-            return new BemisPage(
-                Component.literal("Returned a ConversionPage.BodyPart somehow"),
-                List.of(new TextVerse("howdja do that??")));
-        }
+        // God bless the garbage collector
+        var out = new BemisAdocConverter.Out();
+        BemisBookRegistry.ASCIIDOCTOR.convert(src,
+            Options.builder()
+                .backend("bemis")
+                .toFile(false)
+                .option(BemisApi.OUTPUT_SMUGGLING_SENTINEL, out)
+                .build(),
+            BemisPage.class);
+        return this.page = out.getPage();
     }
 
     /**

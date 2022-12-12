@@ -32,7 +32,7 @@ public class ScreenPosVerse implements BemisVerse {
     public static final class Macro extends BlockMacroProcessor {
         @Override
         public Object process(StructuralNode parent, String target, Map<String, Object> attributes) {
-            return BemisApi.get().makeVerseMacroNode(this, parent, List.of(new ScreenPosVerse()));
+            return BemisApi.get().makeVerseLiteralNode(this, parent, List.of(new ScreenPosVerse()));
         }
     }
 }

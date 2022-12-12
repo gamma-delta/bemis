@@ -50,9 +50,15 @@ public class BemisApi {
     public static final String BOOK_DEFINER = "bemis.json";
 
     /**
-     * The name of the special string Bemis uses to identify verse block macros.
+     * The name of the special string Bemis uses to identify literal verses.
+     * <p>
+     * AsciiDoc <i>really</i> wants to output strings or its own AST nodes, not objects.
+     * To get around this, use the {@link IBemisApi::makeVerseMacroNode} function,
+     * which wraps a list of verses so AsciiDoc can handle it.
      */
-    public static final String BLOCK_MACRO_SENTINEL = "BEMIS_BLOCK_MACRO_SENTINEL";
+    public static final String VERSE_LITERAL_SENTINEL = "BEMIS_VERSE_LITERAL_SENTINEL";
+
+    public static final String OUTPUT_SMUGGLING_SENTINEL = "BEMIS_OUTPUT_SMUGGLING_SENTINEL";
 
     /**
      * The extension Bemis looks for to see if something's a file that should be loaded as a page.
@@ -113,9 +119,10 @@ public class BemisApi {
         }
 
         /**
-         * Convert a list of {@link BemisVerse}s into the form Bemis uses internally to identify verse-producing macros.
+         * Convert a list of {@link BemisVerse}s into the form Bemis uses internally to identify
+         * AST nodes that are just verses.
          */
-        Block makeVerseMacroNode(BlockMacroProcessor self, StructuralNode parent, List<BemisVerse> verses);
+        Block makeVerseLiteralNode(BlockMacroProcessor self, StructuralNode parent, List<BemisVerse> verses);
 
         /**
          * Get the Java extension registry for the global AsciiDoctor instance.
@@ -132,7 +139,7 @@ public class BemisApi {
          * <p>
          * See <a href=https://docs.asciidoctor.org/asciidoc/latest/subs/>the AsciiDoctor</a> docs.
          */
-        default String unsubstituteAdoc(String raw) {
+        default String unsubstituteAdoc(String raw, boolean removeNewlines) {
             var bob = new StringBuilder();
 
             var anchor = 0;
@@ -176,6 +183,11 @@ public class BemisApi {
 
                     // skip past this whole dealio and keep parsing from there
                     i = endIdx;
+                } else if (raw.charAt(i) == '\n' && removeNewlines) {
+                    // Skip the newline
+                    bob.append(raw, anchor, i);
+                    bob.append(' ');
+                    anchor = i + 1;
                 }
             }
 

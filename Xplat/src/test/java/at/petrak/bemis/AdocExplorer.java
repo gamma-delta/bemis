@@ -42,7 +42,7 @@ public class AdocExplorer {
         @Override
         public Object process(StructuralNode parent, String target, Map<String, Object> attributes) {
             var verse = new TextVerse("testing macro! through the macro!");
-            return BemisApi.get().makeVerseMacroNode(this, parent, List.of(verse));
+            return BemisApi.get().makeVerseLiteralNode(this, parent, List.of(verse));
         }
     }
 }
