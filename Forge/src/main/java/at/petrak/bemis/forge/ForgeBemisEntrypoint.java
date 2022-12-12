@@ -1,8 +1,8 @@
 package at.petrak.bemis.forge;
 
 import at.petrak.bemis.api.BemisApi;
-import at.petrak.bemis.impl.BemisBookRegistry;
-import at.petrak.bemis.impl.adoc.RegisterAdocStuff;
+import at.petrak.bemis.core.impl.BemisBookRegistry;
+import at.petrak.bemis.core.adoc.RegisterAdocStuff;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

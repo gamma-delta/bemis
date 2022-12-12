@@ -10,6 +10,10 @@ public interface BemisVerse {
     /**
      * Render this to the screen. The {@link PoseStack} is set up such that {@code 0,0} is the top-left corner of the
      * writable area this verse is entitled to.
+     * <p>
+     * This is called once before the screen is presented to the player, and then once each frame.
+     * The first time is for Bemis' benefit, to record the height this verse requires.
+     * You can also use it for your own initialization -- check {@code ctx.isInit()}.
      *
      * @return the height in pixels this verse used up. A given instance of a verse MUST return the same
      * height every time this is called, or bad things will happen.

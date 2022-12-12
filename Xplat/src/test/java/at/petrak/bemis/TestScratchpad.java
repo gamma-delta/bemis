@@ -1,6 +1,6 @@
 package at.petrak.bemis;
 
-import at.petrak.bemis.impl.BookSkeleton;
+import at.petrak.bemis.core.impl.BookSkeleton;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 

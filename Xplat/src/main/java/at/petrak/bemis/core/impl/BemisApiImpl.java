@@ -1,13 +1,13 @@
-package at.petrak.bemis.impl;
+package at.petrak.bemis.core.impl;
 
 import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.book.BemisBook;
 import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.book.BemisVerse;
-import at.petrak.bemis.impl.adoc.BemisAdocConverter;
-import at.petrak.bemis.impl.adoc.ConversionPage;
-import at.petrak.bemis.impl.adoc.SneakyLiteralVerses;
+import at.petrak.bemis.core.adoc.BemisAdocConverter;
+import at.petrak.bemis.core.adoc.SneakyLiteralVerses;
 import net.minecraft.resources.ResourceLocation;
+import org.asciidoctor.Options;
 import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.StructuralNode;
 import org.asciidoctor.extension.BlockMacroProcessor;

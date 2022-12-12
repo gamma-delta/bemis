@@ -1,25 +1,28 @@
 package at.petrak.bemis.api;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.resources.ResourceLocation;
 
-public final class BemisDrawCtx {
-    public final Font font;
-    public final int width;
+/**
+ * Information about drawing.
+ */
+public interface BemisDrawCtx {
+    Font font();
+
+    int width();
+
+    int x();
+
+    int y();
+
+    double mouseX();
+
+    double mouseY();
+
+    ResourceLocation bookTexture();
 
     /**
-     * Screen-space X-pos of the left corner
+     * Return whether this is being "drawn" the first time to initialize and record the height.
      */
-    public int x;
-
-    /**
-     * Screen-space Y-pos of the top corner
-     */
-    public int y;
-
-    public BemisDrawCtx(Font font, int width, int x, int y) {
-        this.font = font;
-        this.width = width;
-        this.x = x;
-        this.y = y;
-    }
+    boolean isInit();
 }

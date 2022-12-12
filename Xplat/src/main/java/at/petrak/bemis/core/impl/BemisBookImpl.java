@@ -1,4 +1,4 @@
-package at.petrak.bemis.impl;
+package at.petrak.bemis.core.impl;
 
 import at.petrak.bemis.api.IBemisResourceLoader;
 import at.petrak.bemis.api.IndexTreeNode;
@@ -7,7 +7,6 @@ import at.petrak.bemis.api.book.BemisBookConfig;
 import at.petrak.bemis.api.book.BemisBookPath;
 import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.verses.ErrorVerse;
-import at.petrak.bemis.api.verses.TextVerse;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 

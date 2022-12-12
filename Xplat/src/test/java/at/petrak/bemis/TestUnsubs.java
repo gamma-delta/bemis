@@ -11,6 +11,6 @@ class TestUnsubs {
         var test = "Cross: &#x2020; or &#8224;. Euro: &#x20AC; or &#8364;. Lozenge: &#x25CA; or &#9674;";
         var target = "Cross: † or †. Euro: € or €. Lozenge: ◊ or ◊";
 
-        assertEquals(target, BemisApi.get().unsubstituteAdoc(test));
+        assertEquals(target, BemisApi.get().unsubstituteAdoc(test, true));
     }
 }

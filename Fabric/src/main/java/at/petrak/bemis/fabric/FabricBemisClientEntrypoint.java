@@ -1,7 +1,7 @@
 package at.petrak.bemis.fabric;
 
-import at.petrak.bemis.impl.BemisBookRegistry;
-import at.petrak.bemis.impl.adoc.RegisterAdocStuff;
+import at.petrak.bemis.core.impl.BemisBookRegistry;
+import at.petrak.bemis.core.adoc.RegisterAdocStuff;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 

@@ -1,16 +1,16 @@
 package at.petrak.bemis.client;
 
-import at.petrak.bemis.api.BemisDrawCtx;
+import at.petrak.bemis.api.BemisRenderHelper;
 import at.petrak.bemis.api.IBemisResourceLoader;
 import at.petrak.bemis.api.book.BemisBook;
 import at.petrak.bemis.api.book.BemisBookPath;
 import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.book.BemisVerse;
-import at.petrak.bemis.impl.RecManResourceLoader;
+import at.petrak.bemis.core.BemisDrawCtxImpl;
+import at.petrak.bemis.core.impl.RecManResourceLoader;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -21,7 +21,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-import java.util.List;
 import java.util.function.ObjIntConsumer;
 
 import static at.petrak.bemis.api.BemisApi.modLoc;
@@ -46,6 +45,8 @@ public class ScreenBook extends Screen {
 
     protected IBemisResourceLoader loader;
 
+    protected double mouseX = 0, mouseY = 0;
+
     public ScreenBook(BemisBook book) {
         super(Component.translatable(book.getConfig().title()));
         this.book = book;
@@ -57,7 +58,7 @@ public class ScreenBook extends Screen {
     protected void updatePageToPath() {
         this.currentPage = this.book.loadPage(this.path, this.loader);
 
-        var whDeficit = RenderHelper.widthHeightDeficit(this.width, this.height, CONTENT_ASPECT_RATIO);
+        var whDeficit = BemisRenderHelper.widthHeightDeficit(this.width, this.height, CONTENT_ASPECT_RATIO);
         int letterboxedW = (int) ((this.width - whDeficit.firstFloat()) * CONTENT_WIDTH_PROP);
         int letterboxedH = (int) (letterboxedW / CONTENT_ASPECT_RATIO);
         int x = (this.width - letterboxedW) / 2;
@@ -75,6 +76,12 @@ public class ScreenBook extends Screen {
     }
 
     @Override
+    public void mouseMoved(double $$0, double $$1) {
+        this.mouseX = $$0;
+        this.mouseY = $$1;
+    }
+
+    @Override
     public void render(PoseStack ps, int mx, int my, float partialTicks) {
         this.renderBookBacking(ps);
 
@@ -82,7 +89,7 @@ public class ScreenBook extends Screen {
     }
 
     public void renderBookBacking(PoseStack ps) {
-        var whDeficit = RenderHelper.widthHeightDeficit(this.width, this.height, BG_ASPECT_RATIO);
+        var whDeficit = BemisRenderHelper.widthHeightDeficit(this.width, this.height, BG_ASPECT_RATIO);
         int letterboxedW = (int) ((this.width - whDeficit.firstFloat()) * BG_WIDTH_PROP);
         int letterboxedH = (int) (letterboxedW / BG_ASPECT_RATIO);
         int x = (this.width - letterboxedW) / 2;
@@ -93,13 +100,9 @@ public class ScreenBook extends Screen {
         this.fillGradient(ps, 0, 0, this.width, this.height, 0xc0_101010, 0xd0_101010);
 
         ps.translate(0, 0, 1);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, this.backgroundTex);
-        blit(ps,
-            x, y, letterboxedW, letterboxedH, // x, y, w, h
-            0, 0, BOOK_TEX_WIDTH, BOOK_TEX_HEIGHT, // u, v, uw, vh
-            256, 256); // texture size
+        BemisRenderHelper.drawTexture(ps, this.backgroundTex,
+            x, y, letterboxedW, letterboxedH,
+            0, 0, BOOK_TEX_WIDTH, BOOK_TEX_HEIGHT);
 
         ps.popPose();
     }
@@ -123,7 +126,7 @@ public class ScreenBook extends Screen {
             dummyPs.translate(-999999, -999999, 0);
 
             int cursorDown = 0;
-            var ctx = this.makeDrawCtx();
+            var ctx = this.makeDrawCtx(true);
 
             for (var verse : ScreenBook.this.currentPage.verses()) {
                 this.verseHeights.put(cursorDown, verse);
@@ -134,15 +137,18 @@ public class ScreenBook extends Screen {
             this.knownContentHeight = cursorDown;
         }
 
-        protected BemisDrawCtx makeDrawCtx() {
-            return new BemisDrawCtx(ScreenBook.this.minecraft.font, this.width, this.x, this.y - this.scrollDepth);
+        protected BemisDrawCtxImpl makeDrawCtx(boolean isInit) {
+            return new BemisDrawCtxImpl(ScreenBook.this.minecraft.font, this.width,
+                this.x, this.y - this.scrollDepth,
+                ScreenBook.this.mouseX, ScreenBook.this.mouseY,
+                ScreenBook.this.backgroundTex, isInit);
         }
 
         @Override
         public boolean mouseScrolled(double $$0, double $$1, double dy) {
-            // TODO: allow inverse scrolling
+            // TODO: allow inverse scrolling and scroll speed changing
             var scrollAmt = (int) Math.signum(-dy) *
-                (Screen.hasShiftDown() ? 1 : 7);
+                (Screen.hasShiftDown() ? 1 : 15);
             this.scrollDepth += scrollAmt;
 
             if (this.knownContentHeight == -1) {
@@ -174,7 +180,7 @@ public class ScreenBook extends Screen {
 
             // Draw everything below the scroll pos, plus the one before it
             if (!this.verseHeights.isEmpty()) {
-                var ctx = this.makeDrawCtx();
+                var ctx = this.makeDrawCtx(false);
 
                 // Scissor-space is lower-left, window-pixel space
                 // see forge's ScrollPanel
@@ -199,7 +205,7 @@ public class ScreenBook extends Screen {
                     var dy = verse.draw(ps, ctx);
                     if (Screen.hasAltDown()) {
                         ps.translate(0, 0, -1);
-                        RenderHelper.renderColorQuad(ps, 0, 0, this.width, dy, verse.hashCode() | 0xff_303030);
+                        BemisRenderHelper.renderColorQuad(ps, 0, 0, this.width, dy, verse.hashCode() | 0xff_303030);
                     }
 
                     ps.popPose();

@@ -14,18 +14,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * For debugging mostly, displays the screen position.
+ * For debugging mostly, displays the screen position and other stuff.
  */
 public class ScreenPosVerse implements BemisVerse {
+    public int clickCount = 0;
+
     public ScreenPosVerse() {
     }
 
     @Override
     public int draw(PoseStack ps, BemisDrawCtx ctx) {
-        var text = "%d, %d".formatted(ctx.x, ctx.y);
-        ctx.font.draw(ps, Component.literal(text).withStyle(ChatFormatting.GRAY), 0f, 0f, 0xff_ffffff);
+        var text = "%d, %d ; %.2f %.2f ; %dx".formatted(ctx.x(), ctx.y(), ctx.mouseX(), ctx.mouseY(), this.clickCount);
+        ctx.font().draw(ps, Component.literal(text).withStyle(ChatFormatting.DARK_PURPLE), 0f, 0f, 0xff_ffffff);
 
-        return Math.round((ctx.font.lineHeight + 2) * 2);
+        return Math.round((ctx.font().lineHeight + 2) * 2);
+    }
+
+    @Override
+    public void onClick(int cornerX, int cornerY, double mouseX, double mouseY, int button) {
+        this.clickCount += 1;
     }
 
     @Name("screenpos")

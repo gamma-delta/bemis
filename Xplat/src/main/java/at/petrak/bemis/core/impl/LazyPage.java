@@ -1,4 +1,4 @@
-package at.petrak.bemis.impl;
+package at.petrak.bemis.core.impl;
 
 import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.IBemisResourceLoader;

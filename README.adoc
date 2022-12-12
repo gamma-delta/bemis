@@ -31,3 +31,7 @@ This is the part where things like crafting recipe displays are created.
 Then, the client reads the docs.
 In-game, this is where verses get rendered to the screen.
 Or, they can read it in an HTML export.
+
+'''
+
+Some textures are currently "borrowed" from Patchouli (it's creative commons!) but I hope to change that at some point.

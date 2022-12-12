@@ -1,0 +1,12 @@
+so i don't forget
+
+The characters that can make up a macro name
+> /\p{Word}/ - A member of one of the following Unicode general category Letter, Mark, Number, Connector_Punctuation
+this is a ruby special extension and i am going to scream
+why is "mark" a "word"
+
+anyways they're in this file http://www.unicode.org/Public/UCD/latest/ucd/extracted/DerivedGeneralCategory.txt
+abbrs here https://en.wikipedia.org/wiki/Template:General_Category_(Unicode)
+
+Given this i think the best one to replace the namespace `:` is ... god i dunno, `_`
+or some horrible unicode char

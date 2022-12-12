@@ -2,8 +2,9 @@ package at.petrak.bemis;
 
 import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.verses.TextVerse;
-import at.petrak.bemis.impl.adoc.BemisAdocConverter;
-import at.petrak.bemis.impl.adoc.ConversionPage;
+import at.petrak.bemis.core.adoc.BemisAdocConverter;
+import at.petrak.bemis.core.adoc.ConversionPage;
+import net.minecraft.network.chat.Component;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Options;
 import org.asciidoctor.ast.StructuralNode;
@@ -41,7 +42,7 @@ public class AdocExplorer {
     public static class TestMacro extends BlockMacroProcessor {
         @Override
         public Object process(StructuralNode parent, String target, Map<String, Object> attributes) {
-            var verse = new TextVerse("testing macro! through the macro!");
+            var verse = new TextVerse(Component.literal("testing macro! through the macro!"), 1f);
             return BemisApi.get().makeVerseLiteralNode(this, parent, List.of(verse));
         }
     }

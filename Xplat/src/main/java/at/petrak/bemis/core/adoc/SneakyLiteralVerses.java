@@ -1,4 +1,4 @@
-package at.petrak.bemis.impl.adoc;
+package at.petrak.bemis.core.adoc;
 
 import at.petrak.bemis.api.book.BemisVerse;
 
