@@ -7,6 +7,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
  * A section in a {@link BemisPage}, such as a block of text, an image, a crafting recipe...
  */
 public interface BemisVerse {
+    int DEFAULT_VERTICAL_PADDING = 10;
+
     /**
      * Render this to the screen. The {@link PoseStack} is set up such that {@code 0,0} is the top-left corner of the
      * writable area this verse is entitled to.

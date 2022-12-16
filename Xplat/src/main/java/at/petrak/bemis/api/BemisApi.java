@@ -5,6 +5,10 @@ import at.petrak.bemis.api.book.BemisPage;
 import at.petrak.bemis.api.book.BemisVerse;
 import com.google.common.base.Suppliers;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.StructuralNode;
 import org.asciidoctor.extension.BlockMacroProcessor;
@@ -200,5 +204,11 @@ public class BemisApi {
          * Convert a source string to a page.
          */
         BemisPage loadString(String adocSrc);
+
+        /**
+         * Helper function to load a recipe of a given type from the RecipeManager.
+         */
+        @Nullable <C extends Container, T extends Recipe<C>> T getRecipe(RecipeManager recipes, ResourceLocation loc,
+            RecipeType<T> type);
     }
 }

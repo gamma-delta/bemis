@@ -16,7 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -202,6 +201,8 @@ public class ScreenBook extends Screen {
                     ps.pushPose();
                     ps.translate(0, y, 0);
 
+                    RenderSystem.enableBlend();
+                    RenderSystem.enableDepthTest();
                     var dy = verse.draw(ps, ctx);
                     if (Screen.hasAltDown()) {
                         ps.translate(0, 0, -1);

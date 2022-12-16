@@ -7,6 +7,10 @@ import at.petrak.bemis.api.book.BemisVerse;
 import at.petrak.bemis.core.adoc.BemisAdocConverter;
 import at.petrak.bemis.core.adoc.SneakyLiteralVerses;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 import org.asciidoctor.Options;
 import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.StructuralNode;
@@ -53,5 +57,14 @@ public class BemisApiImpl implements BemisApi.IBemisApi {
                 .build(),
             BemisPage.class);
         return out.getPage();
+    }
+
+    @Override
+    public <C extends Container, T extends Recipe<C>> @Nullable T getRecipe(RecipeManager recipes,
+        ResourceLocation loc, RecipeType<T> type) {
+        Recipe<?> recipe = recipes.byKey(loc)
+            .filter(r -> r.getType() == type)
+            .orElse(null);
+        return (T) recipe;
     }
 }

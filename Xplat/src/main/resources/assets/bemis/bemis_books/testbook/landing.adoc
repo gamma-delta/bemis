@@ -11,7 +11,11 @@ Here's another test line...
 
 == More Title
 
-bemis!crafting::[minecraft:piston]
+bemis!recipe::crafting[minecraft:piston]
+
+bemis!recipe::crafting[minecraft:flint_and_steel]
+
+bemis!recipe::crafting[minecraft:white_wool_from_string]
 
 I've come to make an announcement: Shadow the Hedgehog's a bitch-ass motherfucker.
 He pissed on my fucking wife.
@@ -35,8 +39,6 @@ I PISSED ON THE MOON, YOU IDIOT!
 You have twenty-three hours before the piss DROPLETS hit the fucking earth, now get out of my fucking sight before I piss on you too!
 
 screenpos::[]
-
-bemis!crafting::[minecraft:white_wool_from_string]
 
 *Foo* _Bar_ #baz# quux.
 

@@ -3,6 +3,8 @@ package at.petrak.bemis.api.verses;
 import at.petrak.bemis.api.BemisApi;
 import at.petrak.bemis.api.BemisDrawCtx;
 import at.petrak.bemis.api.book.BemisVerse;
+import at.petrak.bemis.api.verses.decal.BemisDecalHolder;
+import at.petrak.bemis.api.verses.decal.MousePosDecal;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -39,7 +41,11 @@ public class ScreenPosVerse implements BemisVerse {
     public static final class Macro extends BlockMacroProcessor {
         @Override
         public Object process(StructuralNode parent, String target, Map<String, Object> attributes) {
-            return BemisApi.get().makeVerseLiteralNode(this, parent, List.of(new ScreenPosVerse()));
+//            return BemisApi.get().makeVerseLiteralNode(this, parent, List.of(new ScreenPosVerse()));
+
+            var decals = new BemisDecalHolder(64, 16);
+            decals.addDecal(new MousePosDecal(16, 16));
+            return BemisApi.get().makeVerseLiteralNode(this, parent, List.of(new CenteredDecalVerse(decals)));
         }
     }
 }
