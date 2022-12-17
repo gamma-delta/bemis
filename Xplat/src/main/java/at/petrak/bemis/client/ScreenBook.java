@@ -137,7 +137,7 @@ public class ScreenBook extends Screen {
         }
 
         protected BemisDrawCtxImpl makeDrawCtx(boolean isInit) {
-            return new BemisDrawCtxImpl(ScreenBook.this.minecraft.font, this.width,
+            return new BemisDrawCtxImpl(ScreenBook.this, ScreenBook.this.minecraft.font, this.width,
                 this.x, this.y - this.scrollDepth,
                 ScreenBook.this.mouseX, ScreenBook.this.mouseY,
                 ScreenBook.this.backgroundTex, isInit);
@@ -204,10 +204,6 @@ public class ScreenBook extends Screen {
                     RenderSystem.enableBlend();
                     RenderSystem.enableDepthTest();
                     var dy = verse.draw(ps, ctx);
-                    if (Screen.hasAltDown()) {
-                        ps.translate(0, 0, -1);
-                        BemisRenderHelper.renderColorQuad(ps, 0, 0, this.width, dy, verse.hashCode() | 0xff_303030);
-                    }
 
                     ps.popPose();
                     ctx.y = y + dy - this.scrollDepth + this.y;

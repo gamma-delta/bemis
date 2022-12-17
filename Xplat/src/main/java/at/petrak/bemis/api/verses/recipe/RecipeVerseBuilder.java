@@ -59,7 +59,10 @@ public class RecipeVerseBuilder {
         return new CenteredDecalVerse(decals);
     }
 
-    public static CenteredDecalVerse crafting(CraftingRecipe recipe) {
+    /**
+     * Convenience builder that sets up building a crafting (table) recipe.
+     */
+    public static RecipeVerseBuilder crafting(CraftingRecipe recipe) {
         var builder = new RecipeVerseBuilder(102, 64, recipe.getResultItem(), 81, 24, null,
             0, 144);
 
@@ -69,18 +72,25 @@ public class RecipeVerseBuilder {
             rw = shaped.getWidth();
             rh = shaped.getHeight();
         }
-        for (int i = 0; i < ingrs.size(); i++) {
-            int x = i % rw;
-            int y = i / rw;
-            builder.add(ingrs.get(i), 5 + x * (16 + 3), 5 + y * (16 + 3));
+        for (int i = 0; i < 9; i++) {
+            int x = i % 3;
+            int y = i / 3;
+            int index = y * rw + x;
+            Ingredient ingr;
+            if (x < rw && y < rh && index < ingrs.size()) {
+                ingr = ingrs.get(index);
+            } else {
+                ingr = Ingredient.EMPTY;
+            }
+            builder.add(ingr, 5 + x * (16 + 3), 5 + y * (16 + 3));
         }
 
-        return builder.build();
+        return builder;
     }
 
     @Name("bemis!recipe")
     @PositionalAttributes({"recipe"})
-    public static final class RecipeMacro extends BlockMacroProcessor {
+    public static final class Macro extends BlockMacroProcessor {
         @Override
         public Object process(StructuralNode parent, String target, Map<String, Object> attributes) {
             BemisVerse verse;
@@ -99,7 +109,7 @@ public class RecipeVerseBuilder {
                             verse =
                                 new ErrorVerse("bemis!recipe: could not find a recipe for `%s`".formatted(recipeLoc));
                         } else {
-                            verse = RecipeVerseBuilder.crafting(recipe);
+                            verse = RecipeVerseBuilder.crafting(recipe).build();
                         }
                     }
                     default -> {

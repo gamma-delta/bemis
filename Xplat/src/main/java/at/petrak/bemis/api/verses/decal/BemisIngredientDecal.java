@@ -5,8 +5,12 @@ import at.petrak.bemis.api.BemisRenderHelper;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+
+import java.util.ArrayList;
 
 public class BemisIngredientDecal extends BemisDecal {
     public final Ingredient ingredient;
@@ -55,6 +59,24 @@ public class BemisIngredientDecal extends BemisDecal {
                     0, 12, 4, 4,
                     0, 220, 4, 4);
                 RenderSystem.enableDepthTest();
+            }
+
+            if (isHovered) {
+                // TODO: some kind of tag detection dammit am i just copying EMI lmao
+                var tts = new ArrayList<>(ctx.getStackTooltip(this.items[0]));
+                if (this.items.length >= 2) {
+                    // TODO
+                    tts.add(ClientTooltipComponent.create(
+                        Component
+                            .literal("and %d others".formatted(this.items.length - 1))
+                            .getVisualOrderText()));
+                }
+//                RenderSystem.disableDepthTest();
+                ps.pushPose();
+                ps.translate(0, 0, 100);
+                ctx.drawTooltip(ps, tts, (int) mx, (int) my);
+                ps.popPose();
+//                RenderSystem.enableDepthTest();
             }
         }
     }

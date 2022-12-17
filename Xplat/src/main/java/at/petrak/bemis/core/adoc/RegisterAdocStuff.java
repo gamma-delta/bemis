@@ -16,7 +16,7 @@ public class RegisterAdocStuff {
         var exts = BemisApi.get().getJavaExtensionRegistry();
 
         exts.blockMacro(ScreenPosVerse.Macro.class);
-        exts.blockMacro(RecipeVerseBuilder.RecipeMacro.class);
+        exts.blockMacro(RecipeVerseBuilder.Macro.class);
     }
 
     private static void reachMyFunnyLittleFingersIntoAdocAndDoThingsIProbablyShouldnt() {

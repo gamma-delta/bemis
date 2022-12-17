@@ -4,6 +4,9 @@ import at.petrak.bemis.api.BemisDrawCtx;
 import at.petrak.bemis.api.BemisRenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+/**
+ * Another test
+ */
 public class MousePosDecal extends BemisDecal {
     public MousePosDecal(int x, int y) {
         super(x, y, 64, 16);

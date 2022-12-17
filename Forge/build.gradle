@@ -19,7 +19,6 @@ apply plugin: 'org.spongepowered.mixin'
 
 archivesBaseName = getArtifactID("forge")
 
-
 configurations {
     shade
     implementation.extendsFrom shade
@@ -121,13 +120,10 @@ dependencies {
     shade "org.asciidoctor:asciidoctorj:${asciiDoctorJVersion}"
 }
 
-/*
 mixin {
-    add sourceSets.main, "hexcasting.mixins.refmap.json"
-    config "hexplat.mixins.json"
-    config "hexcasting_forge.mixins.json"
+    add sourceSets.main, "bemis.mixins.refmap.json"
+    config "bemis.mixins.json"
 }
-*/
 
 sourcesJar {
     from project(":Xplat").sourceSets.main.allJava
